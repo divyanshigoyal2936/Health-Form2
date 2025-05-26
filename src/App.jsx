@@ -1,148 +1,111 @@
 import React, { useState } from 'react';
+import { useNavigate, BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-export default function HealthForm() {
+const GenderSelect = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-purple-300 to-blue-300">
+      <h1 className="text-3xl font-bold mb-8">Choose Your Gender</h1>
+      <div className="flex gap-12">
+        
+        <div onClick={() => navigate('/form/man')} className="cursor-pointer">
+          <img src="men-removebg-preview.png" alt="Man" className="w-64 h-auto rounded-xl shadow-xl hover:scale-105 transition-transform duration-300" />
+          <p className="text-center mt-2 font-semibold text-xl">Man</p>
+        </div>
+        <div onClick={() => navigate('/form/woman')} className="cursor-pointer">
+          <img src="women-removebg-preview.png" alt="Woman" className="w-64 h-auto rounded-xl shadow-xl hover:scale-105 transition-transform duration-300" />
+          <p className="text-center mt-2 font-semibold text-xl">Woman</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const FormTemplate = ({ gender }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    gender: '',
-    age: '',
-     height: '',
-    weight: '',
-    disease: '',
-    heartCondition: '',
-    pregnant: '',
-    pregnancySymptoms: [],
-    childStatus: '',
-    childIssues: []
+    name: '', age: '', weight: '', height: '',
+    location: '', income: '', dietType: '',
+    foodAvailability: [], healthIssues: [],
+    ...(gender === 'woman' && { pregnant: '' })
   });
-
-  const diseaseOptions = [
-    'Malaria', 'Typhoid', 'Diarrhea', 'Rabies', 'HIV', 'Jaundice',
-    'Tuberculosis', 'Cancer', 'Heart', 'Chicken Pox', 'Coronavirus'
-  ];
-
-  const heartOptions = ['Low BP', 'High BP'];
-  const pregnancySymptomsOptions = [
-    'Painful Body', 'Rashes on Stomach', 'Skin Issues', 'Itching or Irritating',
-    'Headache', 'Vomiting', 'Cough', 'Swelling of Hands and Legs', 'Heavy Body'
-  ];
-
-  const childIssuesOptions = [
-    'Frequent Disease', 'Illness', 'Allergy', 'Infection', 'Diarrhea', 'Fever',
-    'No Activity', 'No Response from Child', 'Heavy Weight of Mother',
-    'Stressful or Anxious Behavior', 'Skin Issues'
-  ];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
-      if (pregnancySymptomsOptions.includes(value)) {
-        setFormData(prev => ({
-          ...prev,
-          pregnancySymptoms: checked
-            ? [...prev.pregnancySymptoms, value]
-            : prev.pregnancySymptoms.filter(item => item !== value)
-        }));
-      } else if (childIssuesOptions.includes(value)) {
-        setFormData(prev => ({
-          ...prev,
-          childIssues: checked
-            ? [...prev.childIssues, value]
-            : prev.childIssues.filter(item => item !== value)
-        }));
-      }
+      setFormData(prev => ({
+        ...prev,
+        [name]: checked
+          ? [...(prev[name] || []), value]
+          : prev[name].filter(item => item !== value),
+      }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto bg-gradient-to-br from-green-100 via-pink-100 to-purple-100 rounded-2xl shadow-2xl space-y-6">
-      <h2 className="text-3xl font-bold text-center text-green-700">Health Check Form</h2>
+    <div className="p-6 max-w-xl mx-auto mt-8 bg-white rounded-xl shadow-lg">
+      <h2 className="text-2xl font-bold mb-4">{gender === 'woman' ? 'Women' : 'Men'} Health Info Form</h2>
+      <form className="space-y-4">
+        <input type="text" name="name" placeholder="Name" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input type="number" name="age" placeholder="Age" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input type="number" name="weight" placeholder="Weight (kg)" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input type="number" name="height" placeholder="Height (cm)" onChange={handleChange} className="w-full p-2 border rounded" />
 
-      <input className="w-full p-2 border rounded border-pink-300 bg-white" name="name" placeholder="Name" onChange={handleChange} />
-      <input className="w-full p-2 border rounded border-purple-300 bg-white" name="address" placeholder="Address" onChange={handleChange} />
-      <input className="w-full p-2 border rounded border-green-300 bg-white" name="phone" placeholder="Phone Number" onChange={handleChange} />
+        <select name="location" onChange={handleChange} className="w-full p-2 border rounded">
+          <option value="">Select Location</option>
+          <option value="Uttar Pradesh">Uttar Pradesh</option>
+        </select>
 
-      <div className="space-y-2">
-        <label className="block text-left font-medium text-purple-800">Gender</label>
-        <div className="flex space-x-4">
-          <label><input type="radio" name="gender" value="Male" onChange={handleChange} /> Male</label>
-          <label><input type="radio" name="gender" value="Female" onChange={handleChange} /> Female</label>
-        </div>
-      </div>
+        <input type="number" name="income" placeholder="Monthly Income" onChange={handleChange} className="w-full p-2 border rounded" />
 
-      <input className="w-full p-2 border rounded border-pink-300 bg-white" type="number" name="age" placeholder="Age" onChange={handleChange} />
-      <input className="w-full p-2 border rounded border-purple-300 bg-white" name="height" placeholder="Height" onChange={handleChange} />
-      <input className="w-full p-2 border rounded border-green-300 bg-white" name="weight" placeholder="Weight" onChange={handleChange} />
-
-      <label className="block font-medium text-purple-800">Disease</label>
-      <select name="disease" onChange={handleChange} className="w-full p-2 border rounded border-pink-300 bg-white">
-        <option value="">Select Disease</option>
-        {diseaseOptions.map(d => <option key={d} value={d}>{d}</option>)}
-      </select>
-
-      {formData.disease === 'Heart' && (
-        <>
-          <label className="block font-medium text-purple-800">Heart Condition</label>
-          <select name="heartCondition" onChange={handleChange} className="w-full p-2 border rounded border-green-300 bg-white">
-            <option value="">Select</option>
-            {heartOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </>
-      )}
-
-      <label className="block font-medium text-purple-800">Are you pregnant?</label>
-      <select name="pregnant" onChange={handleChange} className="w-full p-2 border rounded border-pink-300 bg-white">
-        <option value="">Select</option>
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-      </select>
-
-      {formData.pregnant === 'Yes' && (
-        <div className="space-y-2">
-          <label className="block font-medium text-purple-800">Symptoms</label>
-          {pregnancySymptomsOptions.map(symptom => (
-            <label key={symptom} className="block">
-              <input type="checkbox" value={symptom} checked={formData.pregnancySymptoms.includes(symptom)} onChange={handleChange} /> {symptom}
-            </label>
+        <div>
+          <label className="block font-semibold mb-1">Food Availability</label>
+          {['Dal', 'Roti', 'Spinach', 'Jaggery', 'Milk'].map(item => (
+            <label key={item} className="block"><input type="checkbox" name="foodAvailability" value={item} onChange={handleChange} /> {item}</label>
           ))}
         </div>
-      )}
 
-      {formData.pregnant === 'No' && (
-        <>
-          <label className="block font-medium text-purple-800">Do you have a child?</label>
-          <select name="childStatus" onChange={handleChange} className="w-full p-2 border rounded border-green-300 bg-white">
+        <div>
+          <label className="block font-semibold mb-1">Diet Type</label>
+          <select name="dietType" onChange={handleChange} className="w-full p-2 border rounded">
             <option value="">Select</option>
-            <option value="1 Year">1 Year Old</option>
-            <option value="2 Year">2 Year Old</option>
-            <option value="< 1 Year">Less than 1 Year</option>
-            <option value="No Child">No Child</option>
+            <option value="Vegetarian">Vegetarian</option>
+            <option value="Non-Vegetarian">Non-Vegetarian</option>
           </select>
+        </div>
 
-          {(formData.childStatus === '1 Year' || formData.childStatus === '2 Year' || formData.childStatus === '< 1 Year') && (
-            <div className="space-y-2">
-              <label className="block font-medium text-purple-800">Child Issues</label>
-              {childIssuesOptions.map(issue => (
-                <label key={issue} className="block">
-                  <input type="checkbox" value={issue} checked={formData.childIssues.includes(issue)} onChange={handleChange} /> {issue}
-                </label>
-              ))}
-            </div>
-          )}
+        <div>
+          <label className="block font-semibold mb-1">Health Issues</label>
+          <label><input type="checkbox" name="healthIssues" value="Anemia" onChange={handleChange} /> Anemia</label>
+        </div>
 
-          {formData.childStatus === 'No Child' && (
-            <label className="block text-purple-800">
-              <input type="checkbox" /> No Child, No Pregnant
-            </label>
-          )}
-        </>
-      )}
+        {gender === 'woman' && (
+          <div>
+            <label className="block font-semibold mb-1">Are you pregnant?</label>
+            <select name="pregnant" onChange={handleChange} className="w-full p-2 border rounded">
+              <option value="">Select</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        )}
 
-      <button className="bg-gradient-to-r to-green-500 text-white px-6 py-2 rounded-full shadow-md hover:from-black hover:to-green-600">Submit</button>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mt-4 hover:bg-blue-600">Submit</button>
+      </form>
     </div>
   );
-}
+};
+
+const App = () => (
+  <Router>
+    <Routes>
+      <Route path="/" element={<GenderSelect />} />
+      <Route path="/form/woman" element={<FormTemplate gender="woman" />} />
+      <Route path="/form/man" element={<FormTemplate gender="man" />} />
+    </Routes>
+  </Router>
+);
+
+export default App;
